@@ -27,7 +27,7 @@ module VagrantPlugins
         def get_state(connection, machine)
           return :not_created  if machine.id.nil?
 
-          vm = get_vm_by_uuid connection, machine
+          vm = get_object_by_uuid connection, machine.id
 
           if vm.nil?
             return :not_created
