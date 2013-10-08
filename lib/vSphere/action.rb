@@ -11,7 +11,20 @@ module VagrantPlugins
         Vagrant::Action::Builder.new.tap do |b|
           b.use ConfigValidate
           b.use ConnectVSphere
-          b.use PowerOff
+          b.use Call, GetState do |env, b2|
+            state = env[:machine_state_id]
+            case state
+              when :notcreated
+                # This won't be called, Vagrant will default
+                # to Virtualbox.
+                b2.use MessageNotCreated
+                next
+              when :running
+                b2.use PowerOff
+              when :poweroff
+                next
+            end
+          end
           b.use Destroy
         end
       end
@@ -64,6 +77,28 @@ module VagrantPlugins
         end
       end
 
+      def self.action_halt
+        Vagrant::Action::Builder.new.tap do |b|
+          b.use ConfigValidate
+          b.use ConnectVSphere
+          b.use Call, GetState do |env, b2|
+            state = env[:machine_state_id]
+            case state
+              when :notcreated
+                b2.use MessageNotCreated
+                next
+              when :running
+                b2.use PowerOff
+                next
+              when :poweroff
+                b2.use MessageAlreadyOff
+                next
+              else fail "Unexepcted result from GetState"
+            end
+          end
+        end
+      end
+
       #vSphere specific actions
       def self.action_get_state
         Vagrant::Action::Builder.new.tap do |b|
@@ -93,6 +128,8 @@ module VagrantPlugins
       autoload :GetState, action_root.join('get_state')
       autoload :IsCreated, action_root.join('is_created')
       autoload :MessageAlreadyCreated, action_root.join('message_already_created')
+      autoload :MessageAlreadyRunning, action_root.join('message_already_running')
+      autoload :MessageAlreadyOff, action_root.join('message_already_off')
       autoload :MessageNotCreated, action_root.join('message_not_created')
       autoload :PowerOff, action_root.join('power_off')
       autoload :SyncFolders, action_root.join('sync_folders')
