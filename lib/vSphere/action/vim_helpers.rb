@@ -23,6 +23,16 @@ module VagrantPlugins
           retval = connection.searchIndex.FindByInventoryPath(propSpecs)
           return retval
         end
+        def get_object_by_uuid(connection,uuid,vmsearch=true,datacenter=nil)
+          propSpecs = {
+            :entity => self,
+            :vmSearch => vmsearch,
+            :uuid => uuid
+          }
+          propSpecs[:datacenter] = datacenter if datacenter
+          retval = connection.searchIndex.FindByUuid(propSpecs)
+          return retval
+        end
       end
     end
   end
