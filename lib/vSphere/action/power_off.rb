@@ -13,7 +13,7 @@ module VagrantPlugins
         end
 
         def call(env)
-          vm = get_vm_by_uuid env[:vSphere_connection], env[:machine]
+          vm = get_object_by_uuid env[:vSphere_connection], env[:machine].id
 
           unless vm.nil?
             env[:ui].info I18n.t('vsphere.power_off_vm')

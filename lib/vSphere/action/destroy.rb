@@ -20,7 +20,7 @@ module VagrantPlugins
         end
 
         def destroy_vm(env)
-          vm = get_vm_by_uuid env[:vSphere_connection], env[:machine]
+          vm = get_object_by_uuid env[:vSphere_connection], env[:machine].id
           return if vm.nil?
 
           begin
