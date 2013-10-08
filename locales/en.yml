@@ -16,6 +16,8 @@ en:
       Waiting for SSH to become available...
     rsync_folder: |-
       Rsyncing folder: %{hostpath} => %{guestpath}
+    using_default_target: |-
+      Using the default target folder for VM, consider using config.target_folder
   errors:
     missing_template: |-
       Configured template VM could not be found
@@ -47,3 +49,5 @@ en:
       Configuration must specify a compute resource name
     resource_pool: |-
       Configuration must specify a resource pool name
+    target_folder: |-
+      Configuration must specify a target folder name

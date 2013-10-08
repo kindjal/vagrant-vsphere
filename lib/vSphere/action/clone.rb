@@ -23,15 +23,33 @@ module VagrantPlugins
           raise Error::VSphereError, :message => I18n.t('errors.missing_template') if template.nil?
 
           begin
-            location = RbVmomi::VIM.VirtualMachineRelocateSpec :pool => get_resource_pool(connection, machine)
+
+            if config.resource_pool_name
+              pool = get_object_by_name(connection,config.resource_pool_name)
+              abort "Resource pool not found: #{config.resource_pool_name}" unless pool
+            else
+              # FIXME: Warn about default resource pool?
+              pool = get_resource_pool(connection, machine)
+            end
+
+            if config.target_folder
+              folder = get_object_by_name(connection,config.target_folder)
+              abort "Target folder not found: #{config.target_folder}" unless folder
+            else
+              env[:ui].warning I18n.t('vsphere.using_default_target')
+              folder = template.parent
+            end
+
+            location = RbVmomi::VIM.VirtualMachineRelocateSpec :pool => pool
             spec = RbVmomi::VIM.VirtualMachineCloneSpec :location => location, :powerOn => true, :template => false
 
             env[:ui].info I18n.t('vsphere.creating_cloned_vm')
             env[:ui].info " -- Template VM: #{config.template_name}"
             env[:ui].info " -- Name: #{config.name}"
 
-            new_vm = template.CloneVM_Task(:folder => template.parent, :name => config.name, :spec => spec).wait_for_completion
+            new_vm = template.CloneVM_Task(:folder => folder, :name => config.name, :spec => spec).wait_for_completion
           rescue Exception => e
+            env[:ui].error "An error occurred while cloning VM: " + e.to_s
             raise Errors::VSphereError, :message => e.message
           end
 
