@@ -6,7 +6,7 @@ module VagrantPlugins
   module VSphere
     module Action
       # This middleware uses `rsync` to sync the folders over to the vSphere instance
-      # Borrowed from the Vagrant AWS gem, see https://github.com/mitchellh/vagrant-aws/blob/master/lib/vagrant-aws/action/sync_folders.rb 
+      # Borrowed from the Vagrant AWS gem, see https://github.com/mitchellh/vagrant-aws/blob/master/lib/vagrant-aws/action/sync_folders.rb
       class SyncFolders
         include Vagrant::Util::ScopedHashOverride
 
@@ -16,7 +16,7 @@ module VagrantPlugins
 
         def call(env)
           @app.call(env)
-          
+
           ssh_info = env[:machine].ssh_info
 
           env[:machine].config.vm.synced_folders.each do |id, data|
@@ -35,7 +35,7 @@ module VagrantPlugins
             env[:ui].info(I18n.t("vsphere.rsync_folder",
                                 :hostpath => hostpath,
                                 :guestpath => guestpath))
-            
+
             # Create the guest path
             env[:machine].communicate.sudo("mkdir -p '#{guestpath}'")
             env[:machine].communicate.sudo(
@@ -48,7 +48,7 @@ module VagrantPlugins
               "-e", "ssh -p #{ssh_info[:port]} -o StrictHostKeyChecking=no -i '#{ssh_info[:private_key_path]}'",
               hostpath,
               "#{ssh_info[:username]}@#{ssh_info[:host]}:#{guestpath}"]
-            
+
 
             r = Vagrant::Util::Subprocess.execute(*command)
             if r.exit_code != 0
@@ -56,7 +56,7 @@ module VagrantPlugins
                 :guestpath => guestpath,
                 :hostpath => hostpath,
                 :stderr => r.stderr
-            end            
+            end
           end
         end
       end
