@@ -13,10 +13,10 @@ module VagrantPlugins
         end
 
         def call(env)
-          config = env[:machine].provider_config          
+          config = env[:machine].provider_config
           connection = env[:vSphere_connection]
           machine = env[:machine]
-          
+
           dc = get_datacenter connection, machine
           template = dc.find_vm config.template_name
 
@@ -38,15 +38,15 @@ module VagrantPlugins
           #TODO: handle interrupted status in the environment, should the vm be destroyed?
 
           machine.id = new_vm.config.uuid
-          
+
           # wait for SSH to be available 
           env[:ui].info(I18n.t("vsphere.waiting_for_ssh"))
-          while true                        
+          while true
             break if env[:machine].communicate.ready?
             sleep 5
           end
-          env[:ui].info I18n.t('vsphere.vm_clone_success')          
-            
+          env[:ui].info I18n.t('vsphere.vm_clone_success')
+
           @app.call env
         end
       end
