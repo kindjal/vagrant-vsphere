@@ -24,9 +24,9 @@ module VagrantPlugins
               b2.use MessageNotCreated
               next
             end
-            
+
             b2.use Provision
-            b2.use SyncFolders            
+            b2.use SyncFolders
           end
         end
       end
@@ -45,7 +45,7 @@ module VagrantPlugins
         end
       end
 
-	    def self.action_up
+      def self.action_up
         Vagrant::Action::Builder.new.tap do |b|
           b.use ConfigValidate
           b.use ConnectVSphere
@@ -55,12 +55,12 @@ module VagrantPlugins
               next
             end
 
-            b2.use Clone 
+            b2.use Clone
           end
-            
-          b.use CloseVSphere 
-          b.use Provision          
-          b.use SyncFolders          
+
+          b.use CloseVSphere
+          b.use Provision
+          b.use SyncFolders
         end
       end
 
