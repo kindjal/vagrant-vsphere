@@ -17,28 +17,35 @@ module VagrantPlugins
           connection = env[:vSphere_connection]
           machine = env[:machine]
 
-          dc = get_datacenter connection, machine
-          template = dc.find_vm config.template_name
+          if config.template_name.include?('/')
+            template = get_object_by_path(connection,config.template_name)
+          else
+            dc = get_datacenter connection, machine
+            template = dc.find_vm config.template_name
+          end
+          abort "Cannot find template #{config.template_name}" unless template
 
           raise Error::VSphereError, :message => I18n.t('errors.missing_template') if template.nil?
 
           begin
 
-            if config.resource_pool_name
-              pool = get_object_by_name(connection,config.resource_pool_name)
+            if config.resource_pool_name and config.resource_pool_name.include?('/')
+              pool = get_object_by_path(connection,config.resource_pool_name)
               abort "Resource pool not found: #{config.resource_pool_name}" unless pool
             else
               # FIXME: Warn about default resource pool?
               pool = get_resource_pool(connection, machine)
             end
+            abort "Cannot find resource pool #{config.resource_pool_name}" unless pool
 
-            if config.target_folder
-              folder = get_object_by_name(connection,config.target_folder)
+            if config.target_folder and config.target_folder.include?('/')
+              folder = get_object_by_path(connection,config.target_folder)
               abort "Target folder not found: #{config.target_folder}" unless folder
             else
               env[:ui].warning I18n.t('vsphere.using_default_target')
               folder = template.parent
             end
+            abort "Cannot find target folder #{config.target_folder}" unless folder
 
             location = RbVmomi::VIM.VirtualMachineRelocateSpec :pool => pool
             spec = RbVmomi::VIM.VirtualMachineCloneSpec :location => location, :powerOn => true, :template => false
