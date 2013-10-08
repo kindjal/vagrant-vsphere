@@ -23,7 +23,7 @@ module VagrantPlugins
         def get_ssh_info(connection, machine)
           return nil if machine.id.nil?
 
-          vm = get_vm_by_uuid connection, machine
+          vm = get_object_by_uuid connection, machine.id
 
           return nil if vm.nil?
 
