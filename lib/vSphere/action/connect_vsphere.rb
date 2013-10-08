@@ -12,7 +12,10 @@ module VagrantPlugins
           config = env[:machine].provider_config
 
           begin
-            env[:vSphere_connection] = RbVmomi::VIM.connect host: config.host, user: config.user, password: config.password, insecure: config.insecure
+            config_hash = config.instance_variables.each_with_object({}) { |var, hash|
+              hash[var.to_s.delete("@").to_sym] = config.instance_variable_get (var)
+            }
+            env[:vSphere_connection] = RbVmomi::VIM.connect config_hash
             @app.call env
           rescue Exception => e
             puts "An error occurred while connecting to vSphere: " + e.to_s
