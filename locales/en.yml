@@ -8,10 +8,14 @@ en:
       Calling vShpere Destroy
     power_off_vm: |-
       Calling vSphere PowerOff
+    power_on_vm: |-
+      Calling vSphere PowerOn
     vm_already_running: |-
       The VM is already running
     vm_already_off: |-
       The VM is already powered off
+    vm_already_on: |-
+      The VM is already powered on
     vm_already_created: |-
       The VM is already created
     vm_not_created: |-

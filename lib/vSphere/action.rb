@@ -71,6 +71,13 @@ module VagrantPlugins
             b2.use Clone
           end
 
+          b.use Call, GetState do |env, b2|
+            if env[:machine_state_id].eql?(:poweroff)
+              b2.use PowerOn
+              next
+            end
+          end
+
           b.use CloseVSphere
           b.use Provision
           b.use SyncFolders
@@ -132,6 +139,7 @@ module VagrantPlugins
       autoload :MessageAlreadyOff, action_root.join('message_already_off')
       autoload :MessageNotCreated, action_root.join('message_not_created')
       autoload :PowerOff, action_root.join('power_off')
+      autoload :PowerOn, action_root.join('power_on')
       autoload :SyncFolders, action_root.join('sync_folders')
     end
   end
